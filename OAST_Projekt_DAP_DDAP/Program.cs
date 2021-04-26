@@ -9,19 +9,8 @@ namespace OAST_Projekt_DAP_DDAP
         {
             try
             {
-                string filePath = FileParser.GetDesiredFile();
-
-                using (StreamReader streamR = new StreamReader(filePath))
-                {
-                    string line;
-
-                    while (!streamR.EndOfStream)
-                    {
-                        line = streamR.ReadLine();
-                        Console.WriteLine(line);
-
-                    }
-                }
+                var networkTopology = new NetworkTopology();
+                
             }
             catch (Exception e)
             {
