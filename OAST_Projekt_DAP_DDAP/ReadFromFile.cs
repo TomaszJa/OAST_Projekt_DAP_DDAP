@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OAST_Projekt_DAP_DDAP.NetworkElements;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -8,6 +9,7 @@ namespace OAST_Projekt_DAP_DDAP
     // Klasa do wyszukiwania ścieżki do pliku żeby nie śmiecić w main
     public class ReadFromFile
     {
+        // Funkcja, która na podstawie wybranego problemu wybiera odpowiednią funkcję do wczytania pliku
         public static void ReadFile()
         {
             string problem = GetProblem();
@@ -37,17 +39,77 @@ namespace OAST_Projekt_DAP_DDAP
             // ilość dostępnych ścieżek
             // 
 
-            // Wczytywanie z pliku (do zrobienia)
-            using (StreamReader streamR = new StreamReader(_filePath))
+            var network = new Network()
             {
-                string line;
+                numberOfLinks = 0,
+                numberOfDemands = 0,
+                links = new List<Link>()
+            };
 
-                while (!streamR.EndOfStream)
+            try
+            {
+                // Wczytywanie z pliku (do zrobienia)
+                using (StreamReader streamR = new StreamReader(_filePath))
                 {
-                    line = streamR.ReadLine();
-                    Console.WriteLine(line);
+                    string line;                    // Zmienna przechowująca wartość linijki wczytanej z pliku
+                    int lineNumber = 0;             // Zmienna potrzebna do przechwywania numeru linijki we wczytywanym pliku
 
+                    while (!streamR.EndOfStream)
+                    {
+                        line = streamR.ReadLine();      // Wczytywanie linijki i przypisanie jej wartości do zmiennej
+                        lineNumber++;
+                        Console.WriteLine(line);
+
+                        // Info o łączach w pliku danych kończy się na -1.
+                        // -1 znajduje się w linijce o numerze = (liczba łączy + 2) {taki format pliku}
+                        if (lineNumber <= network.numberOfLinks + 1)
+                        {
+                            // W pierwszej linijce jest informacja o liczbie łączy w sieci
+                            if (lineNumber == 1)
+                            {
+                                network.numberOfLinks = int.Parse(line);        // Pobranie informacji o liczbie łączy
+                            }
+                            else
+                            {
+                                var values = line.Split(" ");       // Wartości w liniach oddzielone są spacjami, więc zapisujemy je do tablicy
+
+                                // values:
+                                // [0] - węzeł początkowy
+                                // [1] - węzeł końcowy
+                                // [2] - ilość modułów
+                                // [3] - koszt modułów  {niepotrzebny w DAP}
+                                // [4] - wielkość modułu 
+
+                                int _startingNode = int.Parse(values[0]);
+                                int _endingNode = int.Parse(values[1]);
+                                int _numberOfModules = int.Parse(values[2]);
+                                int _moduleSize = int.Parse(values[4]);
+
+
+
+                                var link = new Link()               // na podstawie pobranych wartości tworzymy nowe łącze...
+                                {
+                                    startingNode = _startingNode,
+                                    endingNode = _endingNode,
+                                    capacity = _numberOfModules * _moduleSize,   // tak kazał to liczyć
+                                    linkNumber = lineNumber -1                  // numer łącza odpowiada numerowi linii - 1
+
+                                };
+
+                                network.links.Add(link);            // ...i dodajemy je do sieci
+                            }
+                        }
+                        
+                        if (lineNumber == network.numberOfLinks + 4)    // numer linijki, w której w pliku jest info o liczbie demand
+                        {
+                            network.numberOfDemands = int.Parse(line);
+                        }
+                    }
                 }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
