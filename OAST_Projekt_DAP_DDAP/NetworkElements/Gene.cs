@@ -4,10 +4,9 @@ using System.Text;
 
 namespace OAST_Projekt_DAP_DDAP.NetworkElements
 {
-    public class Route
+    public class Gene
     {
-        public int startNode;
-        public int destinationNode;
+        public List<int> listOfAlleles = new List<int>();
         public int demandSize;
     }
 }

@@ -14,11 +14,12 @@ namespace OAST_Projekt_DAP_DDAP
         {
             string problem = GetProblem();
             string filePath = GetDesiredFilePath();
+            var network = new Network();
 
             switch(problem)
             {
                 case "DAP":
-                    ReadFileForDAP(filePath);
+                    network = ReadFileForDAP(filePath);
                     break;
                 case "DDAP":
                     ReadFileForDDAP(filePath);
@@ -28,7 +29,7 @@ namespace OAST_Projekt_DAP_DDAP
             }
         }
 
-        public static void ReadFileForDAP(string _filePath)
+        public static Network ReadFileForDAP(string _filePath)
         {
             // Potrzebne zmienne: 
             // węzeł początkowy
@@ -43,8 +44,20 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 numberOfLinks = 0,
                 numberOfDemands = 0,
-                links = new List<Link>()
+                links = new List<Link>(),
+                demands = new List<Demand>()
             };
+
+            var basicDemand = new Demand()
+            {
+                startNode = 0,
+                destinationNode = 0,
+                demandSize = 0,
+                numberOfPaths = 0,
+                Paths = new List<PathToNode>()
+            };
+
+            bool demandSaved = false;       // Dzięki tej zmiennej na pewno wczytają się wszystkie żądania
 
             try
             {
@@ -53,6 +66,10 @@ namespace OAST_Projekt_DAP_DDAP
                 {
                     string line;                    // Zmienna przechowująca wartość linijki wczytanej z pliku
                     int lineNumber = 0;             // Zmienna potrzebna do przechwywania numeru linijki we wczytywanym pliku
+                    bool collectDemandInfo = false;      // Zmienna do warunku czy należy zacząć zbierać info o żądaniu
+                    bool collectPaths = false;          // Zmienna do warunku czy należy pobierać info o ścieżkach żądania
+                    int routeLinesNumber = 0;           // Zmienna do numeru linijki z ścieżkami
+
 
                     while (!streamR.EndOfStream)
                     {
@@ -83,17 +100,19 @@ namespace OAST_Projekt_DAP_DDAP
                                 int _startingNode = int.Parse(values[0]);
                                 int _endingNode = int.Parse(values[1]);
                                 int _numberOfModules = int.Parse(values[2]);
+                                int _moduleCost = int.Parse(values[3]);
                                 int _moduleSize = int.Parse(values[4]);
-
 
 
                                 var link = new Link()               // na podstawie pobranych wartości tworzymy nowe łącze...
                                 {
+                                    linkNumber = lineNumber - 1,                  // numer łącza odpowiada numerowi linii - 1
                                     startingNode = _startingNode,
                                     endingNode = _endingNode,
                                     capacity = _numberOfModules * _moduleSize,   // tak kazał to liczyć
-                                    linkNumber = lineNumber -1                  // numer łącza odpowiada numerowi linii - 1
-
+                                    numberOfModules = _numberOfModules,
+                                    moduleCost = _moduleCost,
+                                    moduleSize = _moduleSize
                                 };
 
                                 network.links.Add(link);            // ...i dodajemy je do sieci
@@ -103,6 +122,71 @@ namespace OAST_Projekt_DAP_DDAP
                         if (lineNumber == network.numberOfLinks + 4)    // numer linijki, w której w pliku jest info o liczbie demand
                         {
                             network.numberOfDemands = int.Parse(line);
+                            routeLinesNumber = lineNumber + 4;
+                        }
+
+                        if (line == "" && collectPaths && lineNumber > routeLinesNumber)
+                        {
+                            network.demands.Add(basicDemand);       // Zapisanie żądania
+
+                            demandSaved = true;         // Zmienna pomocnicza
+
+                            basicDemand = new Demand()      // po dodaniu żądania resetujemy jego wartości
+                            {
+                                startNode = 0,
+                                destinationNode = 0,
+                                demandSize = 0,
+                                numberOfPaths = 0,
+                                Paths = new List<PathToNode>()
+                            };
+                        }
+
+                        if (lineNumber > network.numberOfLinks + 4 && line == "")   // pobieranie info o nowym żądaniu
+                        {
+                            routeLinesNumber = lineNumber + 2;
+                            collectDemandInfo = true;
+                            collectPaths = false;
+                        }
+
+                        if (line != "" && collectDemandInfo && lineNumber <= routeLinesNumber)    // pobieranie info o żądaniu...
+                        {
+                            var values = line.Split(" ");
+
+                            if (values.Length == 1)
+                            {
+                                basicDemand.numberOfPaths = int.Parse(values[0]);   // ...ile jest w nim ścieżek
+                                collectPaths = true;
+                            }
+                            else
+                            {
+                                basicDemand.startNode = int.Parse(values[0]);           // i pozostałe dane
+                                basicDemand.destinationNode = int.Parse(values[1]);
+                                basicDemand.demandSize = int.Parse(values[2]);
+                            }                           
+
+                        }
+
+                        if (line != "" && collectPaths && lineNumber > routeLinesNumber)    // Wczytywanie Ścieżek żądania
+                        {
+                            var values = line.Split(" ");
+                            var pathToNode = new PathToNode()
+                            {
+                                pathNumber = int.Parse(values[0])       // Pobranie numeru ścieżki
+                            };
+
+                            for (int i = 1; i < values.Length; i++)     // wpisanie indeksów łączy do ścieżki
+                            {
+                                int linkId;
+
+                                if (int.TryParse(values[i], out linkId))
+                                {
+                                    pathToNode.LinksIds.Add(linkId);
+                                }                              
+                            }
+
+                            basicDemand.Paths.Add(pathToNode);      // Po pobraniu wszystkich wartości dodajemy ścieżkę
+
+                            demandSaved = false;
                         }
                     }
                 }
@@ -111,6 +195,15 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 Console.WriteLine(e.Message);
             }
+
+            // Poniższy if jest wymagany, ponieważ gdy plik z danymi ma za mało pustych linijek na końcu to ostatnie żądanie się
+            // nie dodaje w głównej pętli i trzeba je dodać po.
+            if (!demandSaved)
+            {
+                network.demands.Add(basicDemand);
+            }
+
+            return network; // zwracamy obiekt klasy Network, w którym są wszystkie potrzebne dane wczytane w ładny sposób.
         }
 
         public static void ReadFileForDDAP(string _filePath)
