@@ -8,7 +8,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
     {
         public int numberOfLinks;
         public int numberOfDemands;
-        public List<Link> links = new List<Link>();
-        public List<Demand> demands = new List<Demand>();
+        public List<Link> Links = new List<Link>();
+        public List<Demand> Demands = new List<Demand>();
     }
 }

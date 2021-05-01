@@ -8,5 +8,15 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
     {
         public List<int> listOfAlleles = new List<int>();
         public int demandSize;
+
+        public Gene()
+        {
+
+        }
+        public Gene(List<int> _listOfAlleles, int _demandSize)
+        {
+            listOfAlleles = _listOfAlleles;
+            demandSize = _demandSize;
+        }
     }
 }

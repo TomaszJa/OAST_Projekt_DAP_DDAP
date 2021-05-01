@@ -17,8 +17,8 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
 
         public void PrintProperties()
         {
-            Console.WriteLine($"Numer lacza: {linkNumber}, Wezel poczatkowy: {startingNode}," +
-                $"Wezel koncowy: {endingNode}, Ilosc modulow: {numberOfModules}" +
+            Console.WriteLine($"Numer lacza: {linkNumber}, Wezel poczatkowy: {startingNode}, " +
+                $"Wezel koncowy: {endingNode}, Ilosc modulow: {numberOfModules} " +
                 $"Koszt modulu: {moduleCost}, Rozmiar modulu: {moduleSize}, Pojemnosc lacza: {capacity}");
         }
     }

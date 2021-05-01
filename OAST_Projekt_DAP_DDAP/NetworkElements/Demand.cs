@@ -15,7 +15,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
 
         public void PrintProperties()
         {
-            Console.WriteLine($"Wezel poczatkowy: {startNode}, Wezel koncowy: {destinationNode}" +
+            Console.WriteLine($"Wezel poczatkowy: {startNode}, Wezel koncowy: {destinationNode} " +
                 $"Rozmiar zadania: {demandSize}, Liczba sciezek: {numberOfPaths}, \nSciezki:\n");
 
             foreach (var path in Paths)

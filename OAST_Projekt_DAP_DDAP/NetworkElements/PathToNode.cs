@@ -12,7 +12,12 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
 
         public void PrintProperties()
         {
-            Console.WriteLine($"Numer sciezki: {pathNumber}, Krawedzie sciezki: {LinksIds.ToString()}");
+            Console.WriteLine($"Numer sciezki: {pathNumber}, Krawedzie sciezki: ");
+            foreach (var link in LinksIds)
+            {
+                Console.Write(link.ToString() + " ");
+            }
+            Console.WriteLine();
         }
     }
 }

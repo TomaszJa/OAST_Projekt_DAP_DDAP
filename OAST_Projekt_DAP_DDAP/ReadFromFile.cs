@@ -1,4 +1,5 @@
-﻿using OAST_Projekt_DAP_DDAP.NetworkElements;
+﻿using OAST_Projekt_DAP_DDAP.Algorythms;
+using OAST_Projekt_DAP_DDAP.NetworkElements;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +21,11 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 case "DAP":
                     network = ReadFileForDAP(filePath);
+
+                    var algor = new EvolutionaryAlgorythm();
+
+                    algor.GenerateChromosome(network.Demands);
+
                     break;
                 case "DDAP":
                     ReadFileForDDAP(filePath);
@@ -44,8 +50,8 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 numberOfLinks = 0,
                 numberOfDemands = 0,
-                links = new List<Link>(),
-                demands = new List<Demand>()
+                Links = new List<Link>(),
+                Demands = new List<Demand>()
             };
 
             var basicDemand = new Demand()
@@ -115,7 +121,7 @@ namespace OAST_Projekt_DAP_DDAP
                                     moduleSize = _moduleSize
                                 };
 
-                                network.links.Add(link);            // ...i dodajemy je do sieci
+                                network.Links.Add(link);            // ...i dodajemy je do sieci
                             }
                         }
                         
@@ -127,7 +133,7 @@ namespace OAST_Projekt_DAP_DDAP
 
                         if (line == "" && collectPaths && lineNumber > routeLinesNumber)
                         {
-                            network.demands.Add(basicDemand);       // Zapisanie żądania
+                            network.Demands.Add(basicDemand);       // Zapisanie żądania
 
                             demandSaved = true;         // Zmienna pomocnicza
 
@@ -200,7 +206,7 @@ namespace OAST_Projekt_DAP_DDAP
             // nie dodaje w głównej pętli i trzeba je dodać po.
             if (!demandSaved)
             {
-                network.demands.Add(basicDemand);
+                network.Demands.Add(basicDemand);
             }
 
             return network; // zwracamy obiekt klasy Network, w którym są wszystkie potrzebne dane wczytane w ładny sposób.
