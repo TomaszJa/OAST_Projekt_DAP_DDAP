@@ -15,6 +15,11 @@ namespace OAST_Projekt_DAP_DDAP
         {
             string problem = GetProblem();
             string filePath = GetDesiredFilePath();
+            int seed = GetSeed();
+            int populationSize = GetPopulationSize();
+            double mutationProbability = GetMutationProbability();
+            double crossoverProbability = GetCrossoverProbability();
+
             var network = new Network();
 
             switch(problem)
@@ -22,9 +27,9 @@ namespace OAST_Projekt_DAP_DDAP
                 case "DAP":
                     network = ReadFileForDAP(filePath);
 
-                    var algor = new EvolutionaryAlgorythm();
+                    var algor = new EvolutionaryAlgorythm(seed);
 
-                    algor.GenerateChromosome(network.Demands);
+                    algor.GenerateStartingPopulation(network.Demands, populationSize);
 
                     break;
                 case "DDAP":
@@ -33,6 +38,112 @@ namespace OAST_Projekt_DAP_DDAP
                 default:
                     break;
             }
+        }
+
+        public static int GetSeed()
+        {
+
+            int seed = 1;
+            bool success = false;
+
+            while (!success)
+            {
+                Console.WriteLine("Podaj Ziarno do generatora: ");
+                string value = Console.ReadLine();             // Zmienna przechowująca wybór użytkownika
+
+                int option;
+                success = int.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
+
+                if (success)              
+                {
+                    seed = option;
+                }
+                else
+                {
+                    Console.WriteLine("Niepoprawna wartosc!\n===================");        
+                }
+            }
+
+            return seed;
+        }
+
+        public static int GetPopulationSize()
+        {
+
+            int populationSize = 1;
+            bool success = false;
+
+            while (!success)
+            {
+                Console.WriteLine("Podaj wielkosc populacji poczatkowej: ");
+                string value = Console.ReadLine();             // Zmienna przechowująca wybór użytkownika
+
+                int option;
+                success = int.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
+
+                if (success)
+                {
+                    populationSize = option;
+                }
+                else
+                {
+                    Console.WriteLine("Niepoprawna wartosc!\n===================");
+                }
+            }
+
+            return populationSize;
+        }
+
+        public static double GetMutationProbability()
+        {
+            double mutationProbability = 0.05;
+            bool success = false;
+
+            while (!success)
+            {
+                Console.WriteLine("Podaj prawdopodobienstwo mutacji: ");
+                string value = Console.ReadLine();             // Zmienna przechowująca wybór użytkownika
+
+                double option;
+                success = double.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
+
+                if (success)
+                {
+                    mutationProbability = option;
+                }
+                else
+                {
+                    Console.WriteLine("Niepoprawna wartosc!\n===================");
+                }
+            }
+
+            return mutationProbability;
+        }
+
+        public static double GetCrossoverProbability()
+        {
+            double crossoverProbability = 0.05;
+            bool success = false;
+
+            while (!success)
+            {
+                Console.WriteLine("Podaj prawdopodobienstwo krzyzowania: ");
+                string value = Console.ReadLine();             // Zmienna przechowująca wybór użytkownika
+
+                double option;
+                success = double.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
+
+                if (success)
+                {
+                    crossoverProbability = option;
+                }
+                else
+                {
+                    Console.WriteLine("Niepoprawna wartosc!\n===================");
+                }
+            }
+
+            return crossoverProbability;
         }
 
         public static Network ReadFileForDAP(string _filePath)
@@ -260,7 +371,6 @@ namespace OAST_Projekt_DAP_DDAP
                 else
                 {
                     Console.WriteLine("Niepoprawna wartosc!\n===================");
-                    success = false;            // Jeżeli wartość uda się zamienić na int, ale będzie spoza przedziału to nie wyjdź z pętli while
                 }
             }
 
@@ -304,7 +414,6 @@ namespace OAST_Projekt_DAP_DDAP
                 else
                 {
                     Console.WriteLine("Niepoprawna wartosc!\n===================");
-                    success = false;            // Jeżeli wartość uda się zamienić na int, ale będzie spoza przedziału to nie wyjdź z pętli while
                 }
             }
 

@@ -7,10 +7,10 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
 {
     public class EvolutionaryAlgorythm
     {
-        static int DEFAULT_POPULATION_SIZE = 5;
-        static double DEFAULT_MUTATION_PROBABILITY = 0.05;
-        static double DEFAULT_CROSSOVER_PROBABILITY = 0.2;
-        static int DEFAULT_SEED = 1;
+        const int DEFAULT_POPULATION_SIZE = 5;
+        const double DEFAULT_MUTATION_PROBABILITY = 0.05;
+        const double DEFAULT_CROSSOVER_PROBABILITY = 0.2;
+        const int DEFAULT_SEED = 1;
 
         Random random = new Random(DEFAULT_SEED);   // Domyślnie random będzie korzystać z tego samego ziarna za każdym razem
 
@@ -54,6 +54,48 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
             var chromosome = new Chromosome(genes, 0, 0);       // Po utworzeniu wszystkich genów tworzymy z nich chromosom
 
             return chromosome;
+        }
+
+        public Population GenerateStartingPopulation(List<Demand> _demands, int _populationSize = DEFAULT_POPULATION_SIZE)
+        {
+            var firstPopulation = new Population()
+            {
+                generationNumber = 1
+            };
+
+            for (int i = 0; i < _populationSize; i++)   // stwórz tyle chromosomów ile jest populacji
+            {
+                var chromosome = GenerateChromosome(_demands);      
+                firstPopulation.Chromosomes.Add(chromosome);        // i dodaj do populacji każdy chromosom
+            }
+
+            return firstPopulation;
+        }
+
+        public void MutateChromosome(Chromosome _chromosome, double _mutationProbability = DEFAULT_MUTATION_PROBABILITY)
+        {
+            foreach (var gene in _chromosome.Genes)
+            {
+                if (EventProbability(DEFAULT_MUTATION_PROBABILITY))
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+        }
+
+        public void CrossoverChromosomes()
+        {
+
+        }
+
+        public Boolean EventProbability(double probability)     // funkcja do losowania na podstawie zadanego prawdopodobieństwa
+        {
+            bool result = random.NextDouble() < probability;    // zwraca true jeżeli wylosowana wartość jest mniejsza od prawdopodobieństwa
+            return result;
         }
     }
 }

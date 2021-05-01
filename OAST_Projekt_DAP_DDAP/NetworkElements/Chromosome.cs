@@ -6,7 +6,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
 {
     public class Chromosome
     {
-        public List<Gene> listOfGenes = new List<Gene>();
+        public List<Gene> Genes = new List<Gene>();
         public int DAPfitness;
         public int DDAPfitness;
 
@@ -14,9 +14,9 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
         {
         }
 
-        public Chromosome(List<Gene> _listOfGenes, int _DAPfitness, int _DDAPfitness)
+        public Chromosome(List<Gene> _genes, int _DAPfitness, int _DDAPfitness)
         {
-            listOfGenes = _listOfGenes;
+            Genes = _genes;
             DAPfitness = _DAPfitness;
             DDAPfitness = _DDAPfitness;
         }
