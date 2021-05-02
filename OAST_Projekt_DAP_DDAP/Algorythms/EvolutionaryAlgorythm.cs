@@ -72,24 +72,66 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
             return firstPopulation;
         }
 
-        public void MutateChromosome(Chromosome _chromosome, double _mutationProbability = DEFAULT_MUTATION_PROBABILITY)
+        public Chromosome MutateChromosome(Chromosome _chromosome, double _mutationProbability = DEFAULT_MUTATION_PROBABILITY)
         {
-            foreach (var gene in _chromosome.Genes)
+            foreach (var gene in _chromosome.Genes)     // Algorytm mutacji wykonujemy na każdym genie...
             {
-                if (EventProbability(DEFAULT_MUTATION_PROBABILITY))
+                if (EventProbability(_mutationProbability))     // ...Jeżeli prawdopodobieństwo wyniesie odpowiednią wartość
                 {
+                    var numberOfPaths = gene.listOfAlleles.Count;
 
-                }
-                else
-                {
+                    // Mutacja polega na odebraniu jednostki przepływności z jednego allela (jednej ścieżki)
+                    // i przekazaniu jej innemu allelowi, dlatego losuję dwa allele, między którymi dojdzie do zamiany.
+                    // Oczywiście zakładam (i najpewniej tak jest, bo inaczej algorytm nie miałby to sensu), 
+                    // że istnieją zawsze przynajmniej 2 ścieżki, między którymi można rozdzielić przepływy
+                    var firstPath = random.Next(0, numberOfPaths);
+                    var secondPath = random.Next(0, numberOfPaths);     // losujemy drugą
+                    var success = false;
 
+                    while (!success)
+                    {
+                        if (gene.listOfAlleles[firstPath] == 0)     // Z pierwszej ścieżki zabierzemy przepływ, więc musi być on niezerowy
+                        {
+                            firstPath = random.Next(0, numberOfPaths);
+                        }
+                        else if (gene.listOfAlleles[firstPath] > 0)
+                        {
+                            success = true;
+                        }
+                    }
+
+                    success = false;
+
+                    while (!success)     // Może się tak zdarzyć, że druga wylosowana ścieżka będzie taka sama co pierwsza a tego nie chcemy
+                    {
+                        if (secondPath != firstPath)        // jeżeli ścieżki są różne to można wyjść z pętli
+                        {
+                            success = true;
+                        }
+                        else
+                        {
+                            secondPath = random.Next(0, numberOfPaths);     // Jeżeli są takie same to losujemy inną
+                        }
+                    }
+
+                    // na koniec z pierwszej odejmujemy jednostkę przepływu, a drugiej ją dodajemy
+                    gene.listOfAlleles[firstPath]--;
+                    gene.listOfAlleles[secondPath]++;
+
+                    _chromosome.wasMutated = true;
                 }
             }
+            return _chromosome;
         }
 
-        public void CrossoverChromosomes()
+        public List<Chromosome> CrossoverChromosomes(List<Chromosome> _chromosomes, double _crossoverProbability = DEFAULT_CROSSOVER_PROBABILITY)
         {
+            if (EventProbability(_crossoverProbability))
+            {
+                var parentChromosomes = _chromosomes;   // Lista z rodzicami
 
+            }
+            return _chromosomes;
         }
 
         public Boolean EventProbability(double probability)     // funkcja do losowania na podstawie zadanego prawdopodobieństwa

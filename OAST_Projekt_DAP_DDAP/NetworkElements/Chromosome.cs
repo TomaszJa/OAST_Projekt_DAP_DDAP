@@ -9,6 +9,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
         public List<Gene> Genes = new List<Gene>();
         public int DAPfitness;
         public int DDAPfitness;
+        public bool wasMutated = false;
 
         public Chromosome()
         {
