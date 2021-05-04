@@ -19,6 +19,7 @@ namespace OAST_Projekt_DAP_DDAP
             int populationSize = GetPopulationSize();
             double mutationProbability = GetMutationProbability();
             double crossoverProbability = GetCrossoverProbability();
+            int mutatedChromosomes = 0;
 
             var network = new Network();
 
@@ -31,13 +32,16 @@ namespace OAST_Projekt_DAP_DDAP
 
                     var population = algor.GenerateStartingPopulation(network.Demands, populationSize);
 
-
                     foreach (var chromosome in population.Chromosomes)
                     {
                         algor.MutateChromosome(chromosome, mutationProbability);
+                        if (chromosome.wasMutated)
+                        {
+                            mutatedChromosomes++;
+                        }
                     }
-
                     Console.WriteLine("Mutation finished");
+
                     algor.CrossoverChromosomes(population.Chromosomes, crossoverProbability);
                     Console.WriteLine("Crossover finished");
 

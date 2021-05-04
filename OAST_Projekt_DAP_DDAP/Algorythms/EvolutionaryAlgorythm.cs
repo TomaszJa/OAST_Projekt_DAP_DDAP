@@ -131,41 +131,45 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
                     // i przekazaniu jej innemu allelowi, dlatego losuję dwa allele, między którymi dojdzie do zamiany.
                     // Oczywiście zakładam (i najpewniej tak jest, bo inaczej algorytm nie miałby to sensu), 
                     // że istnieją zawsze przynajmniej 2 ścieżki, między którymi można rozdzielić przepływy
-                    var firstPath = random.Next(0, numberOfPaths);
-                    var secondPath = random.Next(0, numberOfPaths);     // losujemy drugą
-                    var success = false;
-
-                    while (!success)
+                    // Update: Jednak tak nie jest i straciłem na tym 3h :|
+                    if (numberOfPaths > 1)
                     {
-                        if (gene.listOfAlleles[firstPath] == 0)     // Z pierwszej ścieżki zabierzemy przepływ, więc musi być on niezerowy
+                        var firstPath = random.Next(0, numberOfPaths);
+                        var secondPath = random.Next(0, numberOfPaths);     // losujemy drugą
+                        var success = false;
+
+                        while (!success)
                         {
-                            firstPath = random.Next(0, numberOfPaths);
+                            if (gene.listOfAlleles[firstPath] == 0)     // Z pierwszej ścieżki zabierzemy przepływ, więc musi być on niezerowy
+                            {
+                                firstPath = random.Next(0, numberOfPaths);
+                            }
+                            else if (gene.listOfAlleles[firstPath] > 0)
+                            {
+                                success = true;
+                            }
                         }
-                        else if (gene.listOfAlleles[firstPath] > 0)
+
+                        success = false;
+
+                        while (!success)     // Może się tak zdarzyć, że druga wylosowana ścieżka będzie taka sama co pierwsza a tego nie chcemy
                         {
-                            success = true;
+                            if (secondPath != firstPath)        // jeżeli ścieżki są różne to można wyjść z pętli
+                            {
+                                success = true;
+                            }
+                            else
+                            {
+                                secondPath = random.Next(0, numberOfPaths);     // Jeżeli są takie same to losujemy inną
+                            }
                         }
+
+                        // na koniec z pierwszej odejmujemy jednostkę przepływu, a drugiej ją dodajemy
+                        gene.listOfAlleles[firstPath]--;
+                        gene.listOfAlleles[secondPath]++;
+
+                        _chromosome.wasMutated = true;
                     }
-
-                    success = false;
-
-                    while (!success)     // Może się tak zdarzyć, że druga wylosowana ścieżka będzie taka sama co pierwsza a tego nie chcemy
-                    {
-                        if (secondPath != firstPath)        // jeżeli ścieżki są różne to można wyjść z pętli
-                        {
-                            success = true;
-                        }
-                        else
-                        {
-                            secondPath = random.Next(0, numberOfPaths);     // Jeżeli są takie same to losujemy inną
-                        }
-                    }
-
-                    // na koniec z pierwszej odejmujemy jednostkę przepływu, a drugiej ją dodajemy
-                    gene.listOfAlleles[firstPath]--;
-                    gene.listOfAlleles[secondPath]++;
-
-                    _chromosome.wasMutated = true;
                 }
             }
             return _chromosome;
