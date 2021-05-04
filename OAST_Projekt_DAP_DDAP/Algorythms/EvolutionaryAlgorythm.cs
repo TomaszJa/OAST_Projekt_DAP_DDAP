@@ -72,6 +72,53 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
             return firstPopulation;
         }
 
+        // Taka sama funkcja jak MutateChromosome tylko dla pojedynczego genu
+        public Gene MutateGene(Gene gene)
+        {
+            var numberOfPaths = gene.listOfAlleles.Count;
+
+            // Mutacja polega na odebraniu jednostki przepływności z jednego allela (jednej ścieżki)
+            // i przekazaniu jej innemu allelowi, dlatego losuję dwa allele, między którymi dojdzie do zamiany.
+            // Oczywiście zakładam (i najpewniej tak jest, bo inaczej algorytm nie miałby to sensu), 
+            // że istnieją zawsze przynajmniej 2 ścieżki, między którymi można rozdzielić przepływy
+            var firstPath = random.Next(0, numberOfPaths);
+            var secondPath = random.Next(0, numberOfPaths);     // losujemy drugą
+            var success = false;
+
+            while (!success)
+            {
+                if (gene.listOfAlleles[firstPath] == 0)     // Z pierwszej ścieżki zabierzemy przepływ, więc musi być on niezerowy
+                {
+                    firstPath = random.Next(0, numberOfPaths);
+                }
+                else if (gene.listOfAlleles[firstPath] > 0)
+                {
+                    success = true;
+                }
+            }
+
+            success = false;
+
+            while (!success)     // Może się tak zdarzyć, że druga wylosowana ścieżka będzie taka sama co pierwsza a tego nie chcemy
+            {
+                if (secondPath != firstPath)        // jeżeli ścieżki są różne to można wyjść z pętli
+                {
+                    success = true;
+                }
+                else
+                {
+                    secondPath = random.Next(0, numberOfPaths);     // Jeżeli są takie same to losujemy inną
+                }
+            }
+
+            // na koniec z pierwszej odejmujemy jednostkę przepływu, a drugiej ją dodajemy
+            gene.listOfAlleles[firstPath]--;
+            gene.listOfAlleles[secondPath]++;
+
+            return gene;
+        }
+
+        // Poniższa funkcja działa dla mniejszych sieci, ale przestaje w trakcie jej wykonywania działać program dla zbyt dużej sieci z dużym pstwem mutacji
         public Chromosome MutateChromosome(Chromosome _chromosome, double _mutationProbability = DEFAULT_MUTATION_PROBABILITY)
         {
             foreach (var gene in _chromosome.Genes)     // Algorytm mutacji wykonujemy na każdym genie...
@@ -126,12 +173,44 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
 
         public List<Chromosome> CrossoverChromosomes(List<Chromosome> _chromosomes, double _crossoverProbability = DEFAULT_CROSSOVER_PROBABILITY)
         {
-            if (EventProbability(_crossoverProbability))
-            {
-                var parentChromosomes = _chromosomes;   // Lista z rodzicami
+            var parentChromosomes = new List<Chromosome>();  // Lista z rodzicami
+            parentChromosomes.AddRange(_chromosomes);
+            var childrenChromosomes = new List<Chromosome>();   // Lista z dziećmi
 
+            while (parentChromosomes.Count >= 2)        // Wykonujemy krzyżowanie do momentu aż będą minumum 2 chromosmy do skrzyżowania ze sobą
+            {
+                var firstChromosome = parentChromosomes[0];     // Pobieranie dwóch rodziców
+                var secondChromosome = parentChromosomes[1];
+
+                if (EventProbability(_crossoverProbability))    // Jeżeli zachodzi krzyżowanie to...
+                {
+                    var firstChildrenChromosome = new Chromosome();     // ...tworzone są 2 dzieci...
+                    var secondChildrenChromosome = new Chromosome();
+
+                    for (int i = 0; i < firstChromosome.Genes.Count; i++)         // ...na podstawie genów rodziców
+                    {
+                        if (EventProbability(0.5))
+                        {
+                            firstChildrenChromosome.Genes.Add(firstChromosome.Genes[i]);    // Dodaj do pierwszego dziecka gen pierwszego rodzica
+                            secondChildrenChromosome.Genes.Add(secondChromosome.Genes[i]);  // a do drugiego gen drugiego rodzica
+                        }
+                        else // lub odwrotnie
+                        {
+                            firstChildrenChromosome.Genes.Add(secondChromosome.Genes[i]);    // Dodaj do pierwszego dziecka gen drugiego rodzica
+                            secondChildrenChromosome.Genes.Add(firstChromosome.Genes[i]);    // a do drugiego gen pierwszego rodzica
+                        }
+                    }
+
+                    childrenChromosomes.Add(firstChildrenChromosome);       // utworzone chromosomy dodajemy do listy z dziećmi
+                    childrenChromosomes.Add(secondChildrenChromosome);
+
+                    parentChromosomes.RemoveAt(1);      // usuwamy z pomocniczej listy 1 i 2 rodzica, ponieważ potem na początku pętli
+                    parentChromosomes.RemoveAt(0);      // wybieramy kolejne 2 chromosomy o indeksach 0 i 1 z tej listy i nie chcę żeby się powtarzały w nieskończoność
+                }
             }
-            return _chromosomes;
+            _chromosomes.AddRange(childrenChromosomes);     // Na koniec dodajemy do rodziców ich dzieci, dzięki czemu uzyskujemy listę z oboma pokoleniami
+
+            return _chromosomes;        // i ją zwracamy
         }
 
         public Boolean EventProbability(double probability)     // funkcja do losowania na podstawie zadanego prawdopodobieństwa

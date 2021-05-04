@@ -9,7 +9,7 @@ namespace OAST_Projekt_DAP_DDAP
         {
             try
             {
-                var networkTopology = new NetworkTopology();
+                ReadFromFile.ReadFile();
                 
             }
             catch (Exception e)

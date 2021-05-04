@@ -29,7 +29,17 @@ namespace OAST_Projekt_DAP_DDAP
 
                     var algor = new EvolutionaryAlgorythm(seed);
 
-                    algor.GenerateStartingPopulation(network.Demands, populationSize);
+                    var population = algor.GenerateStartingPopulation(network.Demands, populationSize);
+
+
+                    foreach (var chromosome in population.Chromosomes)
+                    {
+                        algor.MutateChromosome(chromosome, mutationProbability);
+                    }
+
+                    Console.WriteLine("Mutation finished");
+                    algor.CrossoverChromosomes(population.Chromosomes, crossoverProbability);
+                    Console.WriteLine("Crossover finished");
 
                     break;
                 case "DDAP":
@@ -107,7 +117,7 @@ namespace OAST_Projekt_DAP_DDAP
                 double option;
                 success = double.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
 
-                if (success)
+                if (success && option <= 1)
                 {
                     mutationProbability = option;
                 }
@@ -133,7 +143,7 @@ namespace OAST_Projekt_DAP_DDAP
                 double option;
                 success = double.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
 
-                if (success)
+                if (success && option <= 1)
                 {
                     crossoverProbability = option;
                 }
