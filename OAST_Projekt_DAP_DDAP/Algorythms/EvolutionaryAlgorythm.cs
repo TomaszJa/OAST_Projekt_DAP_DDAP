@@ -186,7 +186,7 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
         // o tyle kopiowanie kolekcji to tak naprawdę kopiowanie referencji do starej kolekcji
         // dlatego trzeba przelecieć po wszystkich elementach w starej kolekcji i kopiować je
         // "ręcznie" do nowej.
-        private static Chromosome CopyChromosome(Chromosome _chromosome)
+        public Chromosome CopyChromosome(Chromosome _chromosome)
         {
             var newChromosome = new Chromosome()
             {

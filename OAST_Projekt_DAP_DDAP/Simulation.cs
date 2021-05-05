@@ -20,7 +20,7 @@ namespace OAST_Projekt_DAP_DDAP
         public int iterationsWithoutBetterSolution = 10;
         public int iterations;
         public int i;   // zmienna zliczająca iteracje algorytmu niezależna od kryterium
-        public int mutations; // jak wyżej tylko mutacje
+        public int mutations; // jak wyżej
         public static int simulationTime; // jak wyżej
         public int stopCryterium = 1;
         public int bestDAP = int.MaxValue;
@@ -30,6 +30,7 @@ namespace OAST_Projekt_DAP_DDAP
         public Network network = new Network();
         private static Timer aTimer;
         public bool DAP = true;  // jak true to algorytm liczy DAP, jak false to DDAP
+        public string filePath;
 
         public Simulation()
         {
@@ -42,6 +43,7 @@ namespace OAST_Projekt_DAP_DDAP
             populationSize = SimulationInfo.populationSize;
             mutationProbability = SimulationInfo.mutationProbability;
             crossoverProbability = SimulationInfo.crossoverProbability;
+            filePath = SimulationInfo.filePath;
         }
 
         public void RunSimulation()
@@ -53,18 +55,30 @@ namespace OAST_Projekt_DAP_DDAP
 
             population = algorythm.CalculateFitness(population, network.Links, network.Demands);    // Obliczamy DAP i DDAP dla pierwszej populacji
 
+            var tree = new Tree();
+
             if (DAP)
             {
-                DAPSimulation(algorythm, population);
+                tree = DAPSimulation(algorythm, population);
+                tree.WriteToDAPFile();
             }
             else
             {
-                DDAPSimulation(algorythm, population);
+                tree = DDAPSimulation(algorythm, population);
+                tree.WriteToDDAPFile();
             }
         }
 
-        public void DAPSimulation(EvolutionaryAlgorythm algorythm, Population population)
+        public Tree DAPSimulation(EvolutionaryAlgorythm algorythm, Population population)
         {
+            var tree = new Tree()       // Obiekt, który przechowuje wyniki, przyda się do zapisu do pliku
+            {
+                seed = seed,
+                mutationProbability = mutationProbability,
+                crossoverProbability = crossoverProbability,
+                populationSize = populationSize,
+                inputFile = filePath
+            }; 
             // OrderBy ustawia obiekty z najniższą wartością fitness na początku listy
             // dzięki temu w algorytmie krzyżowania do krzyżowania będą wybierane najlepsze chromosomy ze sobą
 
@@ -78,15 +92,17 @@ namespace OAST_Projekt_DAP_DDAP
 
             while (!StopAlgorythm())
             {
+                i++;        // numer iteracji algorytmu
                 population.generationNumber++;      // kolejna generacja
 
                 algorythm.CrossoverChromosomes(population.Chromosomes, crossoverProbability);   // Krzyżowanie chromosomów
 
-                foreach (var chromosome in population.Chromosomes)
+                for (int a = 0; a < population.Chromosomes.Count; a++)
                 {
-                    algorythm.MutateChromosome(chromosome, mutationProbability);    // Mutowanie
+                    var chromosome = algorythm.MutateChromosome(population.Chromosomes[a], mutationProbability);    // Mutowanie
                     if (chromosome.wasMutated)
                     {
+                        population.Chromosomes[a] = algorythm.CopyChromosome(chromosome);
                         numberOfMutations--;        // początkowa ilość mutacji jest określona w kryterium i gdy zmaleje do 0 to algorytm skończy działanie
                         mutations++;
                     }
@@ -112,22 +128,52 @@ namespace OAST_Projekt_DAP_DDAP
 
                 PrintInfoAboutBestChromosome(DAPBestPopulation, "Current Best Chromosome For DAP");
 
+                tree.BestChromosomes.Add(DAPBestPopulation.Chromosomes[0]);     // Dodanie najlepszego chromosomu z danej populacji do drzewa genealogicznego
+
                 numberOfGenerations--;      // Kiedy spadnie do 0 to algorytm dla kryterium generacji skończy działanie
 
                 population = new Population()   // Usuwamy starą populację i w jej miejsce tworzymy nową
                 {
                     generationNumber = DAPBestPopulation.generationNumber
-                };    
+                };
                 population.Chromosomes.AddRange(DAPBestPopulation.Chromosomes); // I kopiujemy do niej nową najlepszą. Trzeba w ten sposób.
             }
             aTimer.Stop();
             aTimer.Dispose();
 
             PrintInfoAboutBestChromosome(DAPBestPopulation, "Final Best Chromosome For DAP");
+
+            PrintBasicInfo();
+
+            tree.simulationTime = simulationTime;
+            tree.iterations = i;
+            tree.mutations = mutations;
+
+            return tree;
         }
 
-        public void DDAPSimulation(EvolutionaryAlgorythm algorythm, Population population)
+        private void PrintBasicInfo()
         {
+            Console.WriteLine($"Ziarno: {seed}");
+            Console.WriteLine($"Liczba iteracji algorytmu: {i}");
+            Console.WriteLine($"Czas optymalizacji: {simulationTime}");
+            Console.WriteLine($"Ilość mutacji: {mutations}");
+            Console.WriteLine($"Liczność populacji: {populationSize}\n"
+                              + $"Prawdopodobieństwo krzyżowania: {crossoverProbability}\n"
+                              + $"Prawdopodobieństwo mutacji: {mutationProbability}\n");
+        }
+
+        public Tree DDAPSimulation(EvolutionaryAlgorythm algorythm, Population population)
+        {
+            var tree = new Tree()       // Obiekt, który przechowuje wyniki, przyda się do zapisu do pliku
+            {
+                seed = seed,
+                mutationProbability = mutationProbability,
+                crossoverProbability = crossoverProbability,
+                populationSize = populationSize,
+                inputFile = filePath
+            };
+
             var DDAPBestPopulation = new Population();
             DDAPBestPopulation.Chromosomes.AddRange(population.Chromosomes.OrderBy(x => x.DDAPfitness).ToList());
 
@@ -139,15 +185,17 @@ namespace OAST_Projekt_DAP_DDAP
 
             while (!StopAlgorythm())
             {
+                i++;        // numer iteracji algorytmu
                 population.generationNumber++;      // kolejna generacja
 
                 algorythm.CrossoverChromosomes(population.Chromosomes, crossoverProbability);   // Krzyżowanie chromosomów
 
-                foreach (var chromosome in population.Chromosomes)
+                for (int a = 0; a < population.Chromosomes.Count; a++)
                 {
-                    algorythm.MutateChromosome(chromosome, mutationProbability);    // Mutowanie
+                    var chromosome = algorythm.MutateChromosome(population.Chromosomes[a], mutationProbability);    // Mutowanie
                     if (chromosome.wasMutated)
                     {
+                        population.Chromosomes[a] = algorythm.CopyChromosome(chromosome);
                         numberOfMutations--;        // początkowa ilość mutacji jest określona w kryterium i gdy zmaleje do 0 to algorytm skończy działanie
                         mutations++;
                     }
@@ -172,6 +220,7 @@ namespace OAST_Projekt_DAP_DDAP
                 }
 
                 PrintInfoAboutBestChromosome(DDAPBestPopulation, "Current Best Chromosome For DDAP");
+                tree.BestChromosomes.Add(DDAPBestPopulation.Chromosomes[0]);     // Dodanie najlepszego chromosomu z danej populacji do drzewa genealogicznego
 
                 numberOfGenerations--;      // Kiedy spadnie do 0 to algorytm dla kryterium generacji skończy działanie
 
@@ -185,6 +234,14 @@ namespace OAST_Projekt_DAP_DDAP
             aTimer.Dispose();
 
             PrintInfoAboutBestChromosome(DDAPBestPopulation, "Final Best Chromosome For DDAP");
+
+            PrintBasicInfo();
+
+            tree.simulationTime = simulationTime;
+            tree.iterations = i;
+            tree.mutations = mutations;
+
+            return tree;
         }
 
         public static void PrintInfoAboutBestChromosome(Population population, string message)
