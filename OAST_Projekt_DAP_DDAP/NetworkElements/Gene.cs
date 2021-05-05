@@ -6,7 +6,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
 {
     public class Gene
     {
-        public List<int> listOfAlleles = new List<int>();
+        public List<int> Alleles = new List<int>();
         public int demandSize;
 
         public Gene()
@@ -15,7 +15,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
         }
         public Gene(List<int> _listOfAlleles, int _demandSize)
         {
-            listOfAlleles = _listOfAlleles;
+            Alleles = _listOfAlleles;
             demandSize = _demandSize;
         }
     }

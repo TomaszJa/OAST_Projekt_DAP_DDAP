@@ -9,7 +9,7 @@ namespace OAST_Projekt_DAP_DDAP
         {
             try
             {
-                ReadFromFile.ReadFile();
+                var readFromFile = new ReadFromFile();
                 
             }
             catch (Exception e)

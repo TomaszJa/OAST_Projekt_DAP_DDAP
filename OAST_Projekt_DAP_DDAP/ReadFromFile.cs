@@ -10,48 +10,21 @@ namespace OAST_Projekt_DAP_DDAP
     // Klasa do wyszukiwania ścieżki do pliku żeby nie śmiecić w main
     public class ReadFromFile
     {
-        // Funkcja, która na podstawie wybranego problemu wybiera odpowiednią funkcję do wczytania pliku
-        public static void ReadFile()
+        public string filePath = null;
+        public int seed;
+        public int populationSize;
+        public double mutationProbability;
+        public double crossoverProbability;
+        public Network network = new Network();
+
+        public void GetSimulationInfo()
         {
-            string problem = GetProblem();
-            string filePath = GetDesiredFilePath();
-            int seed = GetSeed();
-            int populationSize = GetPopulationSize();
-            double mutationProbability = GetMutationProbability();
-            double crossoverProbability = GetCrossoverProbability();
-            int mutatedChromosomes = 0;
-
-            var network = new Network();
-
-            switch(problem)
-            {
-                case "DAP":
-                    network = ReadFileForDAP(filePath);
-
-                    var algor = new EvolutionaryAlgorythm(seed);
-
-                    var population = algor.GenerateStartingPopulation(network.Demands, populationSize);
-
-                    foreach (var chromosome in population.Chromosomes)
-                    {
-                        algor.MutateChromosome(chromosome, mutationProbability);
-                        if (chromosome.wasMutated)
-                        {
-                            mutatedChromosomes++;
-                        }
-                    }
-                    Console.WriteLine("Mutation finished");
-
-                    algor.CrossoverChromosomes(population.Chromosomes, crossoverProbability);
-                    Console.WriteLine("Crossover finished");
-
-                    break;
-                case "DDAP":
-                    ReadFileForDDAP(filePath);
-                    break;
-                default:
-                    break;
-            }
+            filePath = GetDesiredFilePath();
+            seed = GetSeed();
+            populationSize = GetPopulationSize();
+            mutationProbability = GetMutationProbability();
+            crossoverProbability = GetCrossoverProbability();
+            network = ReadFile(filePath);
         }
 
         public static int GetSeed()
@@ -160,7 +133,8 @@ namespace OAST_Projekt_DAP_DDAP
             return crossoverProbability;
         }
 
-        public static Network ReadFileForDAP(string _filePath)
+        // Funkcja pobierająca wszystkie dane z pliku
+        public static Network ReadFile(string _filePath)
         {
             // Potrzebne zmienne: 
             // węzeł początkowy
@@ -337,59 +311,6 @@ namespace OAST_Projekt_DAP_DDAP
             return network; // zwracamy obiekt klasy Network, w którym są wszystkie potrzebne dane wczytane w ładny sposób.
         }
 
-        public static void ReadFileForDDAP(string _filePath)
-        {
-            // Wczytywanie z pliku (do zrobienia)
-            using (StreamReader streamR = new StreamReader(_filePath))
-            {
-                string line;
-
-                while (!streamR.EndOfStream)
-                {
-                    line = streamR.ReadLine();
-                    Console.WriteLine(line);
-
-                }
-            }
-        }
-
-        // Funkcja do wyboru rozwiązywanego problemu
-        public static string GetProblem()
-        {
-            string problem = null;
-            bool success = false;
-
-            while (!success)
-            {
-                Console.WriteLine("Wybierz problem do rozwiazania:\n" + "[1] DAP\n" + "[2] DDAP\n");
-                string value = Console.ReadLine();             // Zmienna przechowująca wybór użytkownika
-
-                int option;
-                success = int.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
-
-                if (success && option > 0 && option < 3)          // Jeżeli udało się to zrobić, i wartość jest z przedziału 1-2 to przypisz odpowiednią wartość         
-                {
-                    switch (option)
-                    {
-                        case 1:
-                            problem = "DAP";
-                            break;
-                        case 2:
-                            problem = "DDAP";
-                            break;
-                        default:
-                            Console.WriteLine("Niepoprawna wartosc!");
-                            break;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Niepoprawna wartosc!\n===================");
-                }
-            }
-
-            return problem;
-        }
         // Funkcja odpowiedzialna za znalezienie ścieżki do wybranego pliku
         public static string GetDesiredFilePath()
         {
