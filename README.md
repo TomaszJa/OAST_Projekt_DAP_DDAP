@@ -11,7 +11,8 @@ W folderze Wyniki muszą znajdować się 2 foldery - DAP i DDAP.
 
 Do uruchomienia programu wystarczy pobrać netcoreapp3.1.zip i rozpakować jego zawartość.
 
-W środku znajduje się plik OAST_Projekt_DAP_DDAP.exe, który należy uruchomić.
+W środku znajduje się plik OAST_Projekt_DAP_DDAP.exe, który należy uruchomić 
+(klikając dwukrotnie lewym przyciskiem myszy).
 
 Po uruchomieniu programu użytkownik proszony jest o podanie kolejnych parametrów, 
 wyświetlanych na ekranie.
