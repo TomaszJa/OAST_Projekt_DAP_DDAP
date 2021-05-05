@@ -21,5 +21,17 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
             DAPfitness = _DAPfitness;
             DDAPfitness = _DDAPfitness;
         }
+
+        public void PrintProperties()
+        {
+            foreach (var gene in Genes)
+            {
+                gene.PrintProperties();
+            }
+            Console.WriteLine("####################");
+            Console.WriteLine($"DAP = {DAPfitness}");
+            Console.WriteLine($"DDAP = {DDAPfitness}");
+            Console.WriteLine("####################");
+        }
     }
 }

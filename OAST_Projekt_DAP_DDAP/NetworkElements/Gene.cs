@@ -18,5 +18,12 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
             Alleles = _listOfAlleles;
             demandSize = _demandSize;
         }
+
+        public void PrintProperties()
+        {
+            Console.Write("[");
+            Alleles.ForEach(Console.Write);
+            Console.Write("]\n");
+        }
     }
 }

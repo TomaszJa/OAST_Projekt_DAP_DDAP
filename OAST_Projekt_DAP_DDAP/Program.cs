@@ -9,7 +9,8 @@ namespace OAST_Projekt_DAP_DDAP
         {
             try
             {
-                var readFromFile = new ReadFromFile();
+                var simulation = new Simulation();
+                simulation.RunSimulation();
                 
             }
             catch (Exception e)

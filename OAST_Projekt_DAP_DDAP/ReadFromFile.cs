@@ -47,7 +47,8 @@ namespace OAST_Projekt_DAP_DDAP
                 }
                 else
                 {
-                    Console.WriteLine("Niepoprawna wartosc!\n===================");        
+                    Console.WriteLine("Niepoprawna wartosc!\n===================");
+                    success = false;
                 }
             }
 
@@ -75,6 +76,7 @@ namespace OAST_Projekt_DAP_DDAP
                 else
                 {
                     Console.WriteLine("Niepoprawna wartosc!\n===================");
+                    success = false;
                 }
             }
 
@@ -101,6 +103,7 @@ namespace OAST_Projekt_DAP_DDAP
                 else
                 {
                     Console.WriteLine("Niepoprawna wartosc!\n===================");
+                    success = false;
                 }
             }
 
@@ -127,6 +130,7 @@ namespace OAST_Projekt_DAP_DDAP
                 else
                 {
                     Console.WriteLine("Niepoprawna wartosc!\n===================");
+                    success = false;
                 }
             }
 
@@ -180,7 +184,6 @@ namespace OAST_Projekt_DAP_DDAP
                     {
                         line = streamR.ReadLine();      // Wczytywanie linijki i przypisanie jej wartości do zmiennej
                         lineNumber++;
-                        Console.WriteLine(line);
 
                         // Info o łączach w pliku danych kończy się na -1.
                         // -1 znajduje się w linijce o numerze = (liczba łączy + 2) {taki format pliku}
@@ -349,6 +352,7 @@ namespace OAST_Projekt_DAP_DDAP
                 else
                 {
                     Console.WriteLine("Niepoprawna wartosc!\n===================");
+                    success = false;
                 }
             }
 

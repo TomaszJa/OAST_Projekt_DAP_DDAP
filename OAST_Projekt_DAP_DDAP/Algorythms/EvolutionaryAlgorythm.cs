@@ -120,7 +120,9 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
         // Poniższa funkcja działa dla mniejszych sieci, ale przestaje w trakcie jej wykonywania działać program dla zbyt dużej sieci z dużym pstwem mutacji
         public Chromosome MutateChromosome(Chromosome _chromosome, double _mutationProbability = DEFAULT_MUTATION_PROBABILITY)
         {
-            foreach (var gene in _chromosome.Genes)     // Algorytm mutacji wykonujemy na każdym genie...
+            Chromosome newChromosome = CopyChromosome(_chromosome);
+
+            foreach (var gene in newChromosome.Genes)     // Algorytm mutacji wykonujemy na każdym genie...
             {
                 if (EventProbability(_mutationProbability))     // ...Jeżeli prawdopodobieństwo wyniesie odpowiednią wartość
                 {
@@ -167,11 +169,46 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
                         gene.Alleles[firstPath]--;
                         gene.Alleles[secondPath]++;
 
-                        _chromosome.wasMutated = true;
+                        newChromosome.wasMutated = true;
                     }
                 }
             }
-            return _chromosome;
+            return newChromosome;
+        }
+
+        // Ta metoda jest bardzo istotna, bo inaczej generowane są bugi.
+        // Wynika to z tego, że gdy kopiujemy obiekt, który ma pola to tak naprawdę
+        // nie tworzymy nowych miejsc w pamięci, które przechowują te pola, tylko
+        // referencje do starych pól. To jest spoko w teorii, bo oszczędza pamięć,
+        // ale w praktyce sprawia, że gdy modyfikujemy elementy w nowym obiekcie,
+        // to w rzeczywistości modyfikujemy też te same elementy w starym.
+        // O ile "pojedyncze" pola po skopiowaniu od razu tworzą się jako nowe,
+        // o tyle kopiowanie kolekcji to tak naprawdę kopiowanie referencji do starej kolekcji
+        // dlatego trzeba przelecieć po wszystkich elementach w starej kolekcji i kopiować je
+        // "ręcznie" do nowej.
+        private static Chromosome CopyChromosome(Chromosome _chromosome)
+        {
+            var newChromosome = new Chromosome()
+            {
+                DAPfitness = _chromosome.DAPfitness,
+                DDAPfitness = _chromosome.DDAPfitness,
+                wasMutated = _chromosome.wasMutated
+            };
+
+            foreach (var gene in _chromosome.Genes)
+            {
+                var newGene = new Gene()
+                {
+                    demandSize = gene.demandSize
+                };
+                foreach (var allele in gene.Alleles)
+                {
+                    newGene.Alleles.Add(allele);
+                }
+                newChromosome.Genes.Add(newGene);
+            }
+
+            return newChromosome;
         }
 
         public List<Chromosome> CrossoverChromosomes(List<Chromosome> _chromosomes, double _crossoverProbability = DEFAULT_CROSSOVER_PROBABILITY)
