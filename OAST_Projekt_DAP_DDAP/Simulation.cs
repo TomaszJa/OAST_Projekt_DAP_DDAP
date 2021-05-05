@@ -14,7 +14,7 @@ namespace OAST_Projekt_DAP_DDAP
         ReadFromFile SimulationInfo = new ReadFromFile();
         public int seed;
         public int populationSize;
-        public int time = 10;
+        public static int time = 10;
         public int numberOfGenerations = 10;
         public int numberOfMutations = 100;
         public int iterationsWithoutBetterSolution = 10;
@@ -25,6 +25,7 @@ namespace OAST_Projekt_DAP_DDAP
         public double mutationProbability;
         public double crossoverProbability;
         public Network network = new Network();
+        private static Timer aTimer;
         public bool DAP = true;  // jak true to algorytm liczy DAP, jak false to DDAP
 
         public Simulation()
@@ -70,11 +71,10 @@ namespace OAST_Projekt_DAP_DDAP
             bestDAP = DAPBestPopulation.Chromosomes[0].DAPfitness;
             PrintInfoAboutBestChromosome(DAPBestPopulation, "DAP");
 
-            var timer = new Timer(1000);
+            SetTimer(); // Włączam zegar
 
             while (!StopAlgorythm())
             {
-                //timer.Start();
                 population.generationNumber++;      // kolejna generacja
 
                 algorythm.CrossoverChromosomes(population.Chromosomes, crossoverProbability);   // Krzyżowanie chromosomów
@@ -115,8 +115,9 @@ namespace OAST_Projekt_DAP_DDAP
                     generationNumber = DAPBestPopulation.generationNumber
                 };    
                 population.Chromosomes.AddRange(DAPBestPopulation.Chromosomes); // I kopiujemy do niej nową najlepszą. Trzeba w ten sposób.
-                //timer.Stop();
             }
+            aTimer.Stop();
+            aTimer.Dispose();
 
             PrintInfoAboutBestChromosome(DAPBestPopulation, "Final Best Chromosome For DAP");
         }
@@ -337,7 +338,7 @@ namespace OAST_Projekt_DAP_DDAP
         {
             if (stopCryterium == 1)
             {
-                return time == 0;
+                return time <= 0;
             }
             else if (stopCryterium == 2)
             {
@@ -352,6 +353,21 @@ namespace OAST_Projekt_DAP_DDAP
                 return iterations >= iterationsWithoutBetterSolution;
             }
             return true;
+        }
+
+        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            time--;
+        }
+
+        private static void SetTimer()
+        {
+            // stworzenie zegara
+            aTimer = new Timer(1000);
+            // przypisanie eventu do timera
+            aTimer.Elapsed += OnTimedEvent;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
         }
     }
 }
