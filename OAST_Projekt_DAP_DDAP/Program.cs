@@ -17,6 +17,7 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 Console.WriteLine(e.Message);
             }
+            Console.WriteLine("Aby zamknąć program naciśnij dowolny przycisk...");
             Console.ReadKey();
         }
     }

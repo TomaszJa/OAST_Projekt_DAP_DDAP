@@ -96,7 +96,7 @@ namespace OAST_Projekt_DAP_DDAP
                 double option;
                 success = double.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
 
-                if (success && option <= 1)
+                if (success && option <= 1 && option > 0)
                 {
                     mutationProbability = option;
                 }
