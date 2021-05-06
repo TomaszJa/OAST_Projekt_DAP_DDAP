@@ -26,6 +26,7 @@ namespace OAST_Projekt_DAP_DDAP
             string text = null;
             int i = 1;
 
+            Console.WriteLine("Writing results to file, this might take a while...");
             foreach (var chromosome in BestChromosomes)
             {
                 text += $"Best chromosome in {i} generation: \n";
@@ -47,7 +48,7 @@ namespace OAST_Projekt_DAP_DDAP
             }
 
             text += $"Ziarno: {seed}\n";
-            text += $"Liczba iteracji algorytmu: {i}\n";
+            text += $"Liczba iteracji algorytmu: {i-1}\n";
             text += $"Czas optymalizacji: {simulationTime}\n";
             text += $"Ilość mutacji: {mutations}\n";
             text += $"Liczność populacji: {populationSize}\n"
@@ -56,6 +57,7 @@ namespace OAST_Projekt_DAP_DDAP
 
             OutputFileName("DAP");
             File.WriteAllText($"Wyniki/DAP/{outputFile}", text);
+            Console.WriteLine("Writing Finished!");
         }
 
         public void WriteToDDAPFile()
@@ -63,6 +65,7 @@ namespace OAST_Projekt_DAP_DDAP
             string text = null;
             int i = 1;
 
+            Console.WriteLine("Writing results to a file, this might take a while...");
             foreach (var chromosome in BestChromosomes)
             {
                 text += $"Best chromosome in {i} generation: \n";
@@ -84,8 +87,8 @@ namespace OAST_Projekt_DAP_DDAP
             }
 
             text += $"Ziarno: {seed}\n";
-            text += $"Liczba iteracji algorytmu: {i}\n";
-            text += $"Czas optymalizacji: {simulationTime}\n";
+            text += $"Liczba iteracji algorytmu: {i-1}\n";
+            text += $"Czas optymalizacji: {simulationTime} [s]\n";
             text += $"Ilość mutacji: {mutations}\n";
             text += $"Liczność populacji: {populationSize}\n"
                               + $"Prawdopodobieństwo krzyżowania: {crossoverProbability}\n"
@@ -93,6 +96,7 @@ namespace OAST_Projekt_DAP_DDAP
 
             OutputFileName("DDAP");
             File.WriteAllText($"Wyniki/DDAP/{outputFile}", text);
+            Console.WriteLine("Writing Finished!");
         }
 
         public void OutputFileName(string problem = "")
@@ -103,11 +107,11 @@ namespace OAST_Projekt_DAP_DDAP
             }
             else if (inputFile.Contains("net12_1"))
             {
-                outputFile = $"Wyniki_net12_1_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
+                outputFile = $"net12_1_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
             }
             else if (inputFile.Contains("net12_2"))
             {
-                outputFile = $"Wyniki_net12_2_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
+                outputFile = $"net12_2_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
             }
         }
     }

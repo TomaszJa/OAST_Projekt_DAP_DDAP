@@ -156,7 +156,7 @@ namespace OAST_Projekt_DAP_DDAP
         {
             Console.WriteLine($"Ziarno: {seed}");
             Console.WriteLine($"Liczba iteracji algorytmu: {i}");
-            Console.WriteLine($"Czas optymalizacji: {simulationTime}");
+            Console.WriteLine($"Czas optymalizacji: {simulationTime} [s]");
             Console.WriteLine($"Ilość mutacji: {mutations}");
             Console.WriteLine($"Liczność populacji: {populationSize}\n"
                               + $"Prawdopodobieństwo krzyżowania: {crossoverProbability}\n"
