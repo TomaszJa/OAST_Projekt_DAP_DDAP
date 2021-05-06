@@ -49,7 +49,7 @@ namespace OAST_Projekt_DAP_DDAP
 
             text += $"Ziarno: {seed}\n";
             text += $"Liczba iteracji algorytmu: {i-1}\n";
-            text += $"Czas optymalizacji: {simulationTime}\n";
+            text += $"Czas optymalizacji: {simulationTime} [s]\n";
             text += $"Ilość mutacji: {mutations}\n";
             text += $"Liczność populacji: {populationSize}\n"
                               + $"Prawdopodobieństwo krzyżowania: {crossoverProbability}\n"
