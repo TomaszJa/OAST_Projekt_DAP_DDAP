@@ -26,7 +26,7 @@ namespace OAST_Projekt_DAP_DDAP
             string text = null;
             int i = 1;
 
-            Console.WriteLine("Writing results to file, this might take a while...");
+            Console.WriteLine("Writing results to a file, this might take a while...");
             foreach (var chromosome in BestChromosomes)
             {
                 text += $"Best chromosome in {i} generation: \n";
