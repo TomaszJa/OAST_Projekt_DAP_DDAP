@@ -294,9 +294,9 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
                 }
                 for (int i = 0; i < _links.Count; i++)
                 {
-                    double yValue = l[i] / _links[i].moduleSize;    // Obliczamy wartość y dla danego łącza czyli l(e,x)/rozmiar modułu
+                    double yValue = (double)l[i] / (double)_links[i].moduleSize;    // Obliczamy wartość y dla danego łącza czyli l(e,x)/rozmiar modułu
                     y[i] = (int)Math.Ceiling(yValue);       // i zaokrąglamy w górę, ponieważ jak będzie potrzeba przesłać 10,5 Mb to należy mieć 11 na łączu
-                    F[i] = l[i] - _links[i].moduleCost;     // Obliczamy F(x) dla DAP
+                    F[i] = l[i] - _links[i].capacity;     // Obliczamy F(x) dla DAP
                     chromosome.DDAPfitness += y[i] * _links[i].moduleCost;      // Dodajemy do sumy DDAP, którą chcemy zminimalizować
                 }
                 chromosome.DAPfitness = F.Max();        // Obliczamy maksymalną wartość F(x) dla DAP i zapisujemy ją do zmiennej. Dążymy do tego, by ta wartość
