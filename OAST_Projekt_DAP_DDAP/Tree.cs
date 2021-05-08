@@ -32,21 +32,25 @@ namespace OAST_Projekt_DAP_DDAP
             Console.WriteLine("Writing results to a file, this might take a while...");
             foreach (var chromosome in BestChromosomes)
             {
-                text += $"Best chromosome in {i} generation: \n";
-                foreach (var gene in chromosome.Genes)
+                text += $"\t\t----------Best chromosome in {i} generation----------\n";
+                for (int a = 0; a < chromosome.Genes.Count; a++)
                 {
+                    text += $"Węzeł początkowy: {Demands[a].startNode} | " +
+                        $"Węzeł końcowy: {Demands[a].destinationNode} | " +
+                        $"Rozmiar żądania: {Demands[a].demandSize} | " +
+                        $"Podział na ścieżki:";
                     text += "[ ";
-                    foreach (var allele in gene.Alleles)
+                    foreach (var allele in chromosome.Genes[a].Alleles)
                     {
                         text += $"{allele} ";
                     }
                     text += "]\n";
                 }
 
-                text += "###############\n";
-                text += $"DAP: {chromosome.DAPfitness} \n";
-                text += $"DDAP: {chromosome.DDAPfitness} \n";
-                text += "###############\n";
+                text += "\t\t\t\t###############\n";
+                text += $"\t\t\t\t   DAP: {chromosome.DAPfitness} \n";
+                text += $"\t\t\t\t   DDAP: {chromosome.DDAPfitness} \n";
+                text += "\t\t\t\t###############\n\n";
                 i++;
             }
 
@@ -75,21 +79,25 @@ namespace OAST_Projekt_DAP_DDAP
             Console.WriteLine("Writing results to a file, this might take a while...");
             foreach (var chromosome in BestChromosomes)
             {
-                text += $"Best chromosome in {i} generation: \n";
-                foreach (var gene in chromosome.Genes)
+                text += $"\t\t----------Best chromosome in {i} generation----------\n";
+                for (int a = 0; a < chromosome.Genes.Count; a++)
                 {
+                    text += $"Węzeł początkowy: {Demands[a].startNode} | " +
+                        $"Węzeł końcowy: {Demands[a].destinationNode} | " +
+                        $"Rozmiar żądania: {Demands[a].demandSize} | " +
+                        $"Podział na ścieżki:";
                     text += "[ ";
-                    foreach (var allele in gene.Alleles)
+                    foreach (var allele in chromosome.Genes[a].Alleles)
                     {
                         text += $"{allele} ";
                     }
                     text += "]\n";
                 }
 
-                text += "###############\n";
-                text += $"DAP: {chromosome.DAPfitness} \n";
-                text += $"DDAP: {chromosome.DDAPfitness} \n";
-                text += "###############\n";
+                text += "\t\t\t\t###############\n";
+                text += $"\t\t\t\t   DAP: {chromosome.DAPfitness} \n";
+                text += $"\t\t\t\t   DDAP: {chromosome.DDAPfitness} \n";
+                text += "\t\t\t\t###############\n\n";
                 i++;
             }
 
