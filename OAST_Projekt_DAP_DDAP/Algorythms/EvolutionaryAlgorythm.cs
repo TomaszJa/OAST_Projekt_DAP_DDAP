@@ -117,7 +117,6 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
             return gene;
         }
 
-        // Poniższa funkcja działa dla mniejszych sieci, ale przestaje w trakcie jej wykonywania działać program dla zbyt dużej sieci z dużym pstwem mutacji
         public Chromosome MutateChromosome(Chromosome _chromosome, double _mutationProbability = DEFAULT_MUTATION_PROBABILITY)
         {
             Chromosome newChromosome = CopyChromosome(_chromosome);

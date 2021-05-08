@@ -59,17 +59,17 @@ namespace OAST_Projekt_DAP_DDAP
 
             if (DAP)
             {
-                tree = DAPSimulation(algorythm, population);
+                tree = DAPSimulation(algorythm, population, network);
                 tree.WriteToDAPFile();
             }
             else
             {
-                tree = DDAPSimulation(algorythm, population);
+                tree = DDAPSimulation(algorythm, population, network);
                 tree.WriteToDDAPFile();
             }
         }
 
-        public Tree DAPSimulation(EvolutionaryAlgorythm algorythm, Population population)
+        public Tree DAPSimulation(EvolutionaryAlgorythm algorythm, Population population, Network network)
         {
             var tree = new Tree()       // Obiekt, który przechowuje wyniki, przyda się do zapisu do pliku
             {
@@ -77,7 +77,9 @@ namespace OAST_Projekt_DAP_DDAP
                 mutationProbability = mutationProbability,
                 crossoverProbability = crossoverProbability,
                 populationSize = populationSize,
-                inputFile = filePath
+                inputFile = filePath,
+                Links = network.Links,
+                Demands = network.Demands
             }; 
             // OrderBy ustawia obiekty z najniższą wartością fitness na początku listy
             // dzięki temu w algorytmie krzyżowania do krzyżowania będą wybierane najlepsze chromosomy ze sobą
@@ -163,7 +165,7 @@ namespace OAST_Projekt_DAP_DDAP
                               + $"Prawdopodobieństwo mutacji: {mutationProbability}\n");
         }
 
-        public Tree DDAPSimulation(EvolutionaryAlgorythm algorythm, Population population)
+        public Tree DDAPSimulation(EvolutionaryAlgorythm algorythm, Population population, Network network)
         {
             var tree = new Tree()       // Obiekt, który przechowuje wyniki, przyda się do zapisu do pliku
             {
@@ -171,7 +173,9 @@ namespace OAST_Projekt_DAP_DDAP
                 mutationProbability = mutationProbability,
                 crossoverProbability = crossoverProbability,
                 populationSize = populationSize,
-                inputFile = filePath
+                inputFile = filePath,
+                Links = network.Links,
+                Demands = network.Demands
             };
 
             var DDAPBestPopulation = new Population();

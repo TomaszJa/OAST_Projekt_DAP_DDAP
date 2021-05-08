@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ namespace OAST_Projekt_DAP_DDAP
     public class Tree
     {
         public List<Chromosome> BestChromosomes = new List<Chromosome>();
+        public List<Link> Links = new List<Link>();
+        public List<Demand> Demands = new List<Demand>();
         public int seed;
         public int populationSize;
         public int iterations;
@@ -46,6 +49,10 @@ namespace OAST_Projekt_DAP_DDAP
                 text += "###############\n";
                 i++;
             }
+
+            var bestChromosome = BestChromosomes.Last();
+
+            text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands);
 
             text += $"Ziarno: {seed}\n";
             text += $"Liczba iteracji algorytmu: {i-1}\n";
@@ -86,6 +93,10 @@ namespace OAST_Projekt_DAP_DDAP
                 i++;
             }
 
+            var bestChromosome = BestChromosomes.Last();
+
+            text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands);
+
             text += $"Ziarno: {seed}\n";
             text += $"Liczba iteracji algorytmu: {i-1}\n";
             text += $"Czas optymalizacji: {simulationTime} [s]\n";
@@ -113,6 +124,46 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 outputFile = $"net12_2_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
             }
+        }
+
+        public string CalculateFitnessAndPrintValues(Chromosome chromosome, List<Link> links, List<Demand> demands)
+        {
+            string results = "";
+
+            chromosome.DAPfitness = 0;
+            chromosome.DDAPfitness = 0;
+
+            int[] l = new int[links.Count];    // tablica o długości odpowiadającej ilości łączy, przechwoująca wartość l(e,x) dla każdego łącza
+            int[] F = new int[links.Count];    // tablica przechowująca wartości F(x)
+            int[] y = new int[links.Count];    // tablica przechowująca wartości y dla każdego łącza (DDAP)
+
+            for (int d = 0; d < chromosome.Genes.Count; d++)    // iterujemy po każdym genie w chromosomie (Wykład 1 slajd 13)
+            {
+                for (int p = 0; p < chromosome.Genes[d].Alleles.Count; p++)   // po każdym Allelu (każdej ścieżce)
+                {
+                    var allele = chromosome.Genes[d].Alleles[p];      // pobranie tablicy z allelami
+                    var path = demands[d].Paths[p];            // Pobranie konkretnej ścieżki, w której będziemy sprawdzać, czy znajdują się dane łącza
+
+                    for (int e = 0; e < links.Count; e++)      // e to numer łącza
+                    {
+                        if (path.LinksIds.Contains(e + 1))   // jako, że numerację łączy zaczynamy od 1 to dlatego e + 1
+                        {
+                            l[e] += allele;     // Pobieramy informację o obciążeniu dla danego łącza i dodajemy ją do sumy, z której wyjdzie l(e,x)
+                        }
+
+                    }
+                }
+            }
+            for (int i = 0; i < links.Count; i++)
+            {
+                double yValue = (double)l[i] / (double)links[i].moduleSize;    // Obliczamy wartość y dla danego łącza czyli l(e,x)/rozmiar modułu
+                y[i] = (int)Math.Ceiling(yValue);       // i zaokrąglamy w górę, ponieważ jak będzie potrzeba przesłać 10,5 Mb to należy mieć 11 na łączu
+                F[i] = l[i] - links[i].capacity;     // Obliczamy F(x) dla DAP
+
+                results += $"Obciążenie łącza {i + 1}: {F[i]}; ";
+                results += $"Wymiar łącza {i + 1}: {y[i]}\n";
+            }
+            return results;
         }
     }
 }
