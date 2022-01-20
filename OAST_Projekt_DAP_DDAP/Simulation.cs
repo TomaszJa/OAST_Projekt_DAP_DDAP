@@ -53,7 +53,7 @@ namespace OAST_Projekt_DAP_DDAP
 
             var population = algorythm.GenerateStartingPopulation(network.Demands, populationSize); // Tworzymy pierwszą populację 
 
-            population = algorythm.CalculateFitness(population, network.Links, network.Demands);    // Obliczamy DAP i DDAP dla pierwszej populacji
+            population = algorythm.CalculateFitness(population, network.Links, network.Demands, network.Nodes);    // Obliczamy DAP i DDAP dla pierwszej populacji
 
             var tree = new Tree();
 
@@ -79,7 +79,8 @@ namespace OAST_Projekt_DAP_DDAP
                 populationSize = populationSize,
                 inputFile = filePath,
                 Links = network.Links,
-                Demands = network.Demands
+                Demands = network.Demands,
+                Nodes = network.Nodes
             }; 
             // OrderBy ustawia obiekty z najniższą wartością fitness na początku listy
             // dzięki temu w algorytmie krzyżowania do krzyżowania będą wybierane najlepsze chromosomy ze sobą
@@ -110,7 +111,7 @@ namespace OAST_Projekt_DAP_DDAP
                     }
                 }
 
-                algorythm.CalculateFitness(population, network.Links, network.Demands);  // Obliczamy DAP dla każdego chromosomu
+                algorythm.CalculateFitness(population, network.Links, network.Demands, network.Nodes);  // Obliczamy DAP dla każdego chromosomu
 
                 // Sortujemy chromosomy pod DAP i wybieramy tylko tyle najlepszych chromosomów ile wynosi populacja (po krzyżowaniu jest ich 2x więcej)
                 DAPBestPopulation.Chromosomes.AddRange(population.Chromosomes);
@@ -175,7 +176,8 @@ namespace OAST_Projekt_DAP_DDAP
                 populationSize = populationSize,
                 inputFile = filePath,
                 Links = network.Links,
-                Demands = network.Demands
+                Demands = network.Demands,
+                Nodes = network.Nodes
             };
 
             var DDAPBestPopulation = new Population();
@@ -205,7 +207,7 @@ namespace OAST_Projekt_DAP_DDAP
                     }
                 }
 
-                algorythm.CalculateFitness(population, network.Links, network.Demands);  // Obliczamy DDAP dla każdego chromosomu
+                algorythm.CalculateFitness(population, network.Links, network.Demands, network.Nodes);  // Obliczamy DDAP dla każdego chromosomu
 
                 // Sortujemy chromosomy pod DDAP i wybieramy tylko tyle najlepszych chromosomów ile wynosi populacja (po krzyżowaniu jest ich 2x więcej)
                 DDAPBestPopulation.Chromosomes.AddRange(population.Chromosomes);

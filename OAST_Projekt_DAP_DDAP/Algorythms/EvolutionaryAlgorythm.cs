@@ -304,5 +304,82 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
 
             return _population;
         }
+
+        public Population CalculateFitness(Population _population, List<Link> _links, List<Demand> _demands, List<Node> _nodes)
+        {
+            // Celem DAP jest tak rozdysponować ruchem na łączach, by zminimalizować wartość F(x)
+            // gdzie F(x) = max{l(e,x) - Ce}, czyli ruch na danym łączu - pojemność łącza.
+            // W takim razie trzeba obliczyć F(x) dla każdego chromosomu.
+
+            foreach (var chromosome in _population.Chromosomes)
+            {
+                // Upewniam się, że każdy węzeł ma wyzerowane przepływy
+                foreach (var node in _nodes)
+                {
+                    node.IncomingTraffic = 0;
+                }
+                int averageModuleCost = 0;  // średni koszt modułu potrzebny dla MPI i węzła
+
+                // Upewniam się, że chromosom ma wyzerowane wartości fitness DAP i DDAP
+                chromosome.DAPfitness = 0;
+                chromosome.DDAPfitness = 0;
+
+                int[] l = new int[_links.Count];    // tablica o długości odpowiadającej ilości łączy, przechwoująca wartość l(e,x) dla każdego łącza
+                int[] F = new int[_links.Count];    // tablica przechowująca wartości F(x)
+                int[] y = new int[_links.Count];    // tablica przechowująca wartości y dla każdego łącza (DDAP)
+
+                for (int d = 0; d < chromosome.Genes.Count; d++)    // iterujemy po każdym genie w chromosomie (Wykład 1 slajd 13)
+                {
+                    for (int p = 0; p < chromosome.Genes[d].Alleles.Count; p++)   // po każdym Allelu (każdej ścieżce)
+                    {
+                        var allele = chromosome.Genes[d].Alleles[p];      // pobranie tablicy z allelami
+                        var path = _demands[d].Paths[p];            // Pobranie konkretnej ścieżki, w której będziemy sprawdzać, czy znajdują się dane łącza
+
+                        for (int e = 0; e < _links.Count; e++)      // e to numer łącza
+                        {
+                            if (path.LinksIds.Contains(e + 1))   // jako, że numerację łączy zaczynamy od 1 to dlatego e + 1
+                            {
+                                l[e] += allele;     // Pobieramy informację o obciążeniu dla danego łącza i dodajemy ją do sumy, z której wyjdzie l(e,x)
+                            }
+
+                        }
+                    }
+                }
+                for (int i = 0; i < _links.Count; i++)
+                {
+                    double yValue = (double)l[i] / (double)_links[i].moduleSize;    // Obliczamy wartość y dla danego łącza czyli l(e,x)/rozmiar modułu
+                    y[i] = (int)Math.Ceiling(yValue);       // i zaokrąglamy w górę, ponieważ jak będzie potrzeba przesłać 10,5 Mb to należy mieć 11 na łączu
+                    F[i] = l[i] - _links[i].capacity;     // Obliczamy F(x) dla DAP
+                    chromosome.DDAPfitness += y[i] * _links[i].moduleCost;      // Dodajemy do sumy DDAP, którą chcemy zminimalizować
+
+                    foreach (var node in _nodes)
+                    {
+                        if (node.Index == _links[i].startingNode || node.Index == _links[i].endingNode)
+                        {
+                            node.IncomingTraffic += y[i];
+                        }
+                    }
+                    averageModuleCost += _links[i].moduleCost;
+                }
+                averageModuleCost /= _links.Count;
+                foreach (var node in _nodes)
+                {
+                    if (node.IncomingTraffic > node.Capacity)
+                    {
+                        chromosome.DDAPfitness += (node.IncomingTraffic - node.Capacity) * averageModuleCost; // dodajemy do DDAP koszt wyjścia poza pojemność VM (koszt odrzucenia)
+                        chromosome.DDAPfitness += node.Capacity * 1;
+                    }
+                    else
+                    {
+                        chromosome.DDAPfitness += (node.Capacity - node.IncomingTraffic) * 1;
+                    }
+                }
+
+                chromosome.DAPfitness = F.Max();        // Obliczamy maksymalną wartość F(x) dla DAP i zapisujemy ją do zmiennej. Dążymy do tego, by ta wartość
+                                                        // była jak najmniejsza
+            }
+
+            return _population;
+        }
     }
 }

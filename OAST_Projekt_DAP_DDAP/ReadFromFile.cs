@@ -177,6 +177,7 @@ namespace OAST_Projekt_DAP_DDAP
                     int lineNumber = 0;             // Zmienna potrzebna do przechwywania numeru linijki we wczytywanym pliku
                     bool collectDemandInfo = false;      // Zmienna do warunku czy należy zacząć zbierać info o żądaniu
                     bool collectPaths = false;          // Zmienna do warunku czy należy pobierać info o ścieżkach żądania
+                    bool collectNodes = false;
                     int routeLinesNumber = 0;           // Zmienna do numeru linijki z ścieżkami
 
 
@@ -226,7 +227,32 @@ namespace OAST_Projekt_DAP_DDAP
                                 network.Links.Add(link);            // ...i dodajemy je do sieci
                             }
                         }
-                        
+
+                        if (collectNodes)
+                        {
+                            var values = line.Split(" ");       // Wartości w liniach oddzielone są spacjami, więc zapisujemy je do tablicy
+
+                            // values:
+                            // [0] - indeks węzła
+                            // [1] - pojemność węzła
+
+                            Node node = new Node()
+                            {
+                                Index = int.Parse(values[0]),
+                                Capacity = int.Parse(values[1]),
+                                IncomingTraffic = 0
+                            };
+
+                            network.Nodes.Add(node);
+                        }
+
+                        if (line == "Nodes")
+                        {
+                            collectNodes = true;
+                            collectDemandInfo = false;
+                            collectPaths = false;
+                        }
+
                         if (lineNumber == network.numberOfLinks + 4)    // numer linijki, w której w pliku jest info o liczbie demand
                         {
                             network.numberOfDemands = int.Parse(line);

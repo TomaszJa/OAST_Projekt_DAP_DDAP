@@ -1,6 +1,7 @@
 ﻿using OAST_Projekt_DAP_DDAP.NetworkElements;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace OAST_Projekt_DAP_DDAP
         public List<Chromosome> BestChromosomes = new List<Chromosome>();
         public List<Link> Links = new List<Link>();
         public List<Demand> Demands = new List<Demand>();
+        public List<Node> Nodes = new List<Node>();
         public int seed;
         public int populationSize;
         public int iterations;
@@ -56,7 +58,7 @@ namespace OAST_Projekt_DAP_DDAP
 
             var bestChromosome = BestChromosomes.Last();
 
-            text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands);
+            text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands, Nodes);
 
             text += $"Ziarno: {seed}\n";
             text += $"Liczba iteracji algorytmu: {i-1}\n";
@@ -74,36 +76,33 @@ namespace OAST_Projekt_DAP_DDAP
         public void WriteToDDAPFile()
         {
             string text = null;
-            int i = 1;
+            int i = BestChromosomes.Count;
 
             Console.WriteLine("Writing results to a file, this might take a while...");
-            foreach (var chromosome in BestChromosomes)
-            {
-                text += $"\t\t----------Best chromosome in {i} generation----------\n";
-                for (int a = 0; a < chromosome.Genes.Count; a++)
-                {
-                    text += $"Węzeł początkowy: {Demands[a].startNode} | " +
-                        $"Węzeł końcowy: {Demands[a].destinationNode} | " +
-                        $"Rozmiar żądania: {Demands[a].demandSize} | " +
-                        $"Podział na ścieżki:";
-                    text += "[ ";
-                    foreach (var allele in chromosome.Genes[a].Alleles)
-                    {
-                        text += $"{allele} ";
-                    }
-                    text += "]\n";
-                }
-
-                text += "\t\t\t\t###############\n";
-                text += $"\t\t\t\t   DAP: {chromosome.DAPfitness} \n";
-                text += $"\t\t\t\t   DDAP: {chromosome.DDAPfitness} \n";
-                text += "\t\t\t\t###############\n\n";
-                i++;
-            }
 
             var bestChromosome = BestChromosomes.Last();
 
-            text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands);
+            text += $"\t\t----------Best chromosome in {i} generation----------\n";
+            for (int a = 0; a < bestChromosome.Genes.Count; a++)
+            {
+                text += $"Węzeł początkowy: {Demands[a].startNode} | " +
+                    $"Węzeł końcowy: {Demands[a].destinationNode} | " +
+                    $"Rozmiar żądania: {Demands[a].demandSize} | " +
+                    $"Podział na ścieżki:";
+                text += "[ ";
+                foreach (var allele in bestChromosome.Genes[a].Alleles)
+                {
+                    text += $"{allele} ";
+                }
+                text += "]\n";
+            }
+
+            text += "\t\t\t\t###############\n";
+            text += $"\t\t\t\t   DAP: {bestChromosome.DAPfitness} \n";
+            text += $"\t\t\t\t   DDAP: {bestChromosome.DDAPfitness} \n";
+            text += "\t\t\t\t###############\n\n";
+
+            text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands, Nodes);
 
             text += $"Ziarno: {seed}\n";
             text += $"Liczba iteracji algorytmu: {i-1}\n";
@@ -115,6 +114,7 @@ namespace OAST_Projekt_DAP_DDAP
 
             OutputFileName("DDAP");
             File.WriteAllText($"Wyniki/DDAP/{outputFile}", text);
+            Process.Start("Notepad.exe", $"Wyniki/DDAP/{outputFile}");
             Console.WriteLine("Writing Finished!");
         }
 
@@ -134,9 +134,14 @@ namespace OAST_Projekt_DAP_DDAP
             }
         }
 
-        public string CalculateFitnessAndPrintValues(Chromosome chromosome, List<Link> links, List<Demand> demands)
+        public string CalculateFitnessAndPrintValues(Chromosome chromosome, List<Link> links, List<Demand> demands, List<Node> nodes)
         {
             string results = "";
+
+            foreach (var node in nodes)
+            {
+                node.IncomingTraffic = 0;
+            }
 
             chromosome.DAPfitness = 0;
             chromosome.DDAPfitness = 0;
@@ -168,8 +173,21 @@ namespace OAST_Projekt_DAP_DDAP
                 y[i] = (int)Math.Ceiling(yValue);       // i zaokrąglamy w górę, ponieważ jak będzie potrzeba przesłać 10,5 Mb to należy mieć 11 na łączu
                 F[i] = l[i] - links[i].capacity;     // Obliczamy F(x) dla DAP
 
-                results += $"Obciążenie łącza {i + 1}: {F[i]}; ";
-                results += $"Wymiar łącza {i + 1}: {y[i]}\n";
+                foreach (var node in nodes)
+                {
+                    if (node.Index == links[i].startingNode || node.Index == links[i].endingNode)
+                    {
+                        node.IncomingTraffic += y[i];
+                    }
+                }
+
+                //results += $"Obciążenie łącza {i + 1}: {F[i]}; ";
+                //results += $"Wymiar łącza {i + 1}: {y[i]}\n";
+                results += $"Przepływność łącza {i + 1}: {y[i]} [Mbit/s]\n";
+            }
+            foreach (var node in nodes)
+            {
+                results += $"Obciążenie węzła {node.Index}: {Math.Truncate(((double)node.IncomingTraffic/(double)node.Capacity)*100)}%; \n";
             }
             return results;
         }
