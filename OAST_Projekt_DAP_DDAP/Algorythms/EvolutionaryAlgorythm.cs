@@ -371,7 +371,7 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
                     }
                     else
                     {
-                        chromosome.DDAPfitness += node.IncomingTraffic * 1;
+                        chromosome.DDAPfitness += node.IncomingTraffic/node.Capacity * 10;
                     }
                 }
 

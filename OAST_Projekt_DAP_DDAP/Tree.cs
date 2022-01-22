@@ -119,18 +119,9 @@ namespace OAST_Projekt_DAP_DDAP
 
         public void OutputFileName(string problem = "")
         {
-            if (inputFile.Contains("net4"))
-            {
-                outputFile = $"net4_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
-            }
-            else if (inputFile.Contains("net12_1"))
-            {
-                outputFile = $"net12_1_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
-            }
-            else if (inputFile.Contains("net12_2"))
-            {
-                outputFile = $"net12_2_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
-            }
+            int index = inputFile.IndexOf("data");
+            outputFile = $"{inputFile.Substring(index + 5)}_Population_{populationSize}_mutation_{mutationProbability}_Crossover_{crossoverProbability}_Wyniki_{problem}.txt";
+
         }
 
         public string CalculateFitnessAndPrintValues(Chromosome chromosome, List<Link> links, List<Demand> demands, List<Node> nodes)

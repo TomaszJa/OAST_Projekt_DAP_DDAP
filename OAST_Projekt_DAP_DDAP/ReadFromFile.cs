@@ -356,7 +356,7 @@ namespace OAST_Projekt_DAP_DDAP
                     for (int i = 0; i < files.Length; i++)
                     {
                         int found = files[i].IndexOf("data");
-                        Console.WriteLine($"[{i}] {files[i].Substring(found + 5)}");
+                        Console.WriteLine($"[{i+1}] {files[i].Substring(found + 5)}");
                     }
 
                     string value = Console.ReadLine();             // Zmienna przechowująca wybór użytkownika
@@ -364,12 +364,12 @@ namespace OAST_Projekt_DAP_DDAP
                     int option;
                     success = int.TryParse(value, out option);      // "Spróbuj zamienić string wpisany przez użytkownika na int i zapisać go do zmiennej option"
 
-                    if (success && option >= 0 && option < files.Length)          // Jeżeli udało się to zrobić, i wartość jest z przedziału 1-3 to przypisz odpowiednią wartość         
+                    if (success && option > 0 && option <= files.Length)          // Jeżeli udało się to zrobić, i wartość jest z przedziału 1-3 to przypisz odpowiednią wartość         
                     {
                         // Wyznaczenie ścieżki do pliku z danymi (bo jest różne w zależności od kompa)
                         // katalog z danymi umieszczam w folderze data, w folderze, w którym znajduje się plik .exe
                         // funkcja Path.GetFullPath() zwraca pełną ścieżkę do szukanego pliku.
-                        filePath = files[option];
+                        filePath = files[option-1];
                     }
                     else
                     {
