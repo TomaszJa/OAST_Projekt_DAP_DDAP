@@ -366,12 +366,12 @@ namespace OAST_Projekt_DAP_DDAP.Algorythms
                 {
                     if (node.IncomingTraffic > node.Capacity)
                     {
-                        chromosome.DDAPfitness += (node.IncomingTraffic - node.Capacity) * averageModuleCost; // dodajemy do DDAP koszt wyjścia poza pojemność VM (koszt odrzucenia)
+                        chromosome.DDAPfitness += (node.IncomingTraffic - node.Capacity) * 100; // dodajemy do DDAP koszt wyjścia poza pojemność VM (koszt odrzucenia)
                         chromosome.DDAPfitness += node.Capacity * 1;
                     }
                     else
                     {
-                        chromosome.DDAPfitness += (node.Capacity - node.IncomingTraffic) * 1;
+                        chromosome.DDAPfitness += node.IncomingTraffic * 1;
                     }
                 }
 

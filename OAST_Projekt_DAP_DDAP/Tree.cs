@@ -78,7 +78,7 @@ namespace OAST_Projekt_DAP_DDAP
             string text = null;
             int i = BestChromosomes.Count;
 
-            Console.WriteLine("Writing results to a file, this might take a while...");
+            Console.Clear();
 
             var bestChromosome = BestChromosomes.Last();
 
@@ -87,7 +87,7 @@ namespace OAST_Projekt_DAP_DDAP
             {
                 text += $"Węzeł początkowy: {Demands[a].startNode} | " +
                     $"Węzeł końcowy: {Demands[a].destinationNode} | " +
-                    $"Rozmiar żądania: {Demands[a].demandSize} | " +
+                    $"Rozmiar żądania: {Demands[a].demandSize}[Mbit/s] | " +
                     $"Podział na ścieżki:";
                 text += "[ ";
                 foreach (var allele in bestChromosome.Genes[a].Alleles)
@@ -98,8 +98,7 @@ namespace OAST_Projekt_DAP_DDAP
             }
 
             text += "\t\t\t\t###############\n";
-            text += $"\t\t\t\t   DAP: {bestChromosome.DAPfitness} \n";
-            text += $"\t\t\t\t   DDAP: {bestChromosome.DDAPfitness} \n";
+            text += $"\t\t\t\t   Łączny koszt : {bestChromosome.DDAPfitness} \n";
             text += "\t\t\t\t###############\n\n";
 
             text += CalculateFitnessAndPrintValues(bestChromosome, Links, Demands, Nodes);
@@ -115,7 +114,7 @@ namespace OAST_Projekt_DAP_DDAP
             OutputFileName("DDAP");
             File.WriteAllText($"Wyniki/DDAP/{outputFile}", text);
             Process.Start("Notepad.exe", $"Wyniki/DDAP/{outputFile}");
-            Console.WriteLine("Writing Finished!");
+            Console.WriteLine(text);
         }
 
         public void OutputFileName(string problem = "")
@@ -185,10 +184,12 @@ namespace OAST_Projekt_DAP_DDAP
                 //results += $"Wymiar łącza {i + 1}: {y[i]}\n";
                 results += $"Przepływność łącza {i + 1}: {y[i]} [Mbit/s]\n";
             }
+            results += "\n";
             foreach (var node in nodes)
             {
                 results += $"Obciążenie węzła {node.Index}: {Math.Truncate(((double)node.IncomingTraffic/(double)node.Capacity)*100)}%; \n";
             }
+            results += "\n";
             return results;
         }
     }

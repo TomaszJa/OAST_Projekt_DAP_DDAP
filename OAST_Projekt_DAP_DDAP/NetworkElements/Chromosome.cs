@@ -29,8 +29,7 @@ namespace OAST_Projekt_DAP_DDAP.NetworkElements
                 gene.PrintProperties();
             }
             Console.WriteLine("####################");
-            Console.WriteLine($"DAP = {DAPfitness}");
-            Console.WriteLine($"DDAP = {DDAPfitness}");
+            Console.WriteLine($"Łączny koszt = {DDAPfitness}");
             Console.WriteLine("####################");
         }
     }

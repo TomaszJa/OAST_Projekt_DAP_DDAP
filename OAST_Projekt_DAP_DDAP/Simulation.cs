@@ -36,7 +36,7 @@ namespace OAST_Projekt_DAP_DDAP
         {
             SimulationInfo.GetSimulationInfo();
             stopCryterium = GetCryterium();
-            DAP = GetProblem();
+            DAP = false;// GetProblem();
 
             network = SimulationInfo.network;
             seed = SimulationInfo.seed;
@@ -56,6 +56,8 @@ namespace OAST_Projekt_DAP_DDAP
             population = algorythm.CalculateFitness(population, network.Links, network.Demands, network.Nodes);    // Obliczamy DAP i DDAP dla pierwszej populacji
 
             var tree = new Tree();
+
+            Console.Clear();
 
             if (DAP)
             {
@@ -225,7 +227,7 @@ namespace OAST_Projekt_DAP_DDAP
                     iterations = 0;    // skoro poprawiła się najlepsza wartość to zerujemy iterację do kryterium ilości iteracji bez poprawy
                 }
 
-                PrintInfoAboutBestChromosome(DDAPBestPopulation, "Current Best Chromosome For DDAP");
+                PrintInfoAboutBestChromosome(DDAPBestPopulation, "Current Best Chromosome");
                 tree.BestChromosomes.Add(DDAPBestPopulation.Chromosomes[0]);     // Dodanie najlepszego chromosomu z danej populacji do drzewa genealogicznego
 
                 numberOfGenerations--;      // Kiedy spadnie do 0 to algorytm dla kryterium generacji skończy działanie
@@ -239,7 +241,7 @@ namespace OAST_Projekt_DAP_DDAP
             aTimer.Stop();
             aTimer.Dispose();
 
-            PrintInfoAboutBestChromosome(DDAPBestPopulation, "Final Best Chromosome For DDAP");
+            PrintInfoAboutBestChromosome(DDAPBestPopulation, "Final Best Chromosome");
 
             PrintBasicInfo();
 
@@ -252,6 +254,7 @@ namespace OAST_Projekt_DAP_DDAP
 
         public static void PrintInfoAboutBestChromosome(Population population, string message)
         {
+            Console.SetCursorPosition(0, 0);
             Console.WriteLine($"\n{message}:\n");
             population.Chromosomes[0].PrintProperties();
         }
